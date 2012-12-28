@@ -19,19 +19,19 @@ DEFAULT = '127.0.0.1'
 USER_HOME = os.path.expanduser('~')
 INSTALL_FILE = USER_HOME + os.path.sep + '.name_service.yml'
 
-print "user_home:%s install_file:%s" %(USER_HOME, INSTALL_FILE)
+#print "user_home:%s install_file:%s" %(USER_HOME, INSTALL_FILE)
 
 def install_path():
 	stream = file(INSTALL_FILE, 'r')
 	config = yaml.load(stream)
-	print "config:%s %s" %(config, type(config))
+	#print "config:%s %s" %(config, type(config))
 	return config['service_dir']
 #end method
 
 
 CURRENT = install_path()
 
-print "INSTALL_PATH:%s" %(CURRENT)
+#print "INSTALL_PATH:%s" %(CURRENT)
 
 #CURRENT = os.getcwd()
 ADDRESS_HISTORY = CURRENT+ os.path.sep+ 'historyAddress.txt'
@@ -39,7 +39,7 @@ ADDRESS_CURRENT = CURRENT+ os.path.sep+ 'currentAddress.txt'
 
 DOMAIN_UPDATE_FILE = CURRENT + os.path.sep + 'DomainUpdate.py'
 
-print "pwd:%s\nhistory:%s\ncurrent:%s" %(CURRENT, ADDRESS_HISTORY, ADDRESS_CURRENT)
+#print "pwd:%s\nhistory:%s\ncurrent:%s" %(CURRENT, ADDRESS_HISTORY, ADDRESS_CURRENT)
 
 
 def current():
