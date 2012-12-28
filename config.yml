@@ -1,0 +1,13 @@
+# account information at name.com
+# uncomment below three line for account information
+
+#account:
+#   user_name: hagerhu
+#   api_token: 9a872318asca1b3b2c234d1b1d773ed4385e3ab
+
+
+# domains list need to update DNS record
+# uncomment below two lines for effective
+
+#domains_update:
+#    - hagerhu.com
