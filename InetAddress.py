@@ -96,12 +96,12 @@ def main():
 	value = current()+" "+address+"\n"
 	
 	if (compare != 0):
-		print "address:%s" %(ADDRESS_HISTORY)
+		#print "address:%s" %(ADDRESS_HISTORY)
 		handle = open(ADDRESS_HISTORY,'a')
 		handle.write(value)
 		handle.close()
 		
-		print "address:%s" %(ADDRESS_CURRENT)
+		#print "address:%s" %(ADDRESS_CURRENT)
 		handle = open(ADDRESS_CURRENT,'w')
 		handle.write(value)
 		handle.close()
