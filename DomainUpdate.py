@@ -133,8 +133,8 @@ def name_account(session):
 	api_token = account_api_token()
 	
 	#headers = {'Api-Username':user_name, 'Api-Token':api_token}
-	HEADERS['Api-Usernme'] = user_name;
-	HEADERS['Api-Token'] = api_token;
+	#HEADERS['Api-Usernme'] = user_name;
+	#HEADERS['Api-Token'] = api_token;
 	HEADERS['Api-Session-Token'] = session;
 	
 	print "url:%s header:%s" %(url, HEADERS)
