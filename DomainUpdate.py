@@ -13,11 +13,14 @@ import httplib2, urllib
 import json
 import yaml
 
-
 USER_HOME = os.path.expanduser('~')
 INSTALL_FILE = USER_HOME + os.path.sep + '.name_service.yml'
 
 print "user_home:%s install_file:%s" %(USER_HOME, INSTALL_FILE)
+
+
+HEADERS = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31'}
+
 
 def install_path():
 	stream = file(INSTALL_FILE, 'r')
@@ -42,9 +45,9 @@ BASE_URL = 'https://api.name.com/api/'
 def load_config():
 	stream = file(CONFIG_FILE, 'r')
 	config = yaml.load(stream)
-	print "config:%s" %(config)
+	#print "config:%s" %(config)
 	domains = config['domains_update']
-	print "domains:%s" %(domains)
+	#print "domains:%s" %(domains)
 	
 	return config
 #end method
@@ -68,13 +71,17 @@ def need_update_domains():
 #end method
 
 
+
 #pragma mark -
 #pragma mark Network Connection
 
 def name_hello():
 	h = httplib2.Http()
-	resp, content = h.request(BASE_URL + 'hello', "GET")
-	print "%s\n\n %s\n\n" %(resp, content)
+	url = BASE_URL + "hello"
+	
+	print "url:%s headers:%s" %(url, HEADERS)
+	resp, content = h.request(url, "GET", headers = HEADERS)
+	print "response:%s\n\ncontent:%s\n\n" %(resp, content)
 	
 	return content
 #end method
@@ -87,12 +94,12 @@ def name_login():
 	
 	user_name = account_user_name()
 	api_token = account_api_token()
-	print "username:%s apiToken:%s" %(user_name, api_token)
+	#print "username:%s apiToken:%s" %(user_name, api_token)
 	
 	body = {'username':user_name, 'api_token':api_token}
-	response, content = http.request(url, "POST", body=json.dumps(body))
-	
-	print "%s\n\n %s\n\n" %(response, content)
+	print "url:%s headers:%s" %(url, HEADERS)
+	response, content = http.request(url, "POST", body=json.dumps(body), headers = HEADERS)
+	print "response:%s\n\ncontent:%s\n\n" %(response, content)
 
 	session = json.loads(content)
 
@@ -103,10 +110,13 @@ def name_login():
 def name_logout(session):
 	http = httplib2.Http()
 	url = BASE_URL + 'logout'
-	headers = {'Api-Session-Token':session}
 	
-	response, content = http.request(url, "GET", headers = headers)
-	print "%s\n\n%s\n\n" %(response, content)
+	#headers = {'Api-Session-Token':session}
+	HEADERS['Api-Session-Token'] = session
+	
+	print "url:%s headers:%s" %(url, HEADERS)
+	response, content = http.request(url, "GET", headers = HEADERS)
+	print "response:%s\n\ncontent:%s\n\n" %(response, content)
 	
 	return content
 #end method
@@ -115,18 +125,22 @@ def name_logout(session):
 #pragma mark -
 #pragma Account Info
 
-def name_account():
+def name_account(session):
 	http = httplib2.Http()
 
 	url = BASE_URL + 'account/get'
-	
 	user_name = account_user_name()
 	api_token = account_api_token()
 	
-	headers = {'Api-Username':user_name, 'Api-Token':api_token}
-	response, content = http.request(url, "GET", headers=headers)
+	#headers = {'Api-Username':user_name, 'Api-Token':api_token}
+	HEADERS['Api-Usernme'] = user_name;
+	HEADERS['Api-Token'] = api_token;
+	HEADERS['Api-Session-Token'] = session;
+	
+	print "url:%s header:%s" %(url, HEADERS)
+	response, content = http.request(url, "GET", headers=HEADERS)
 
-	print "%s\n\n%s\n\n" %(response, content)
+	print "response:%s\n\ncontent:%s\n\n" %(response, content)
 	
 	return content
 #end method
@@ -139,11 +153,14 @@ def name_domain_list(session):
 	http = httplib2.Http()
 	
 	url = BASE_URL + 'domain/list'
-	headers = {'Api-Session-Token':session}
 	
-	response, content = http.request(url, "GET", headers = headers)
+	#headers = {'Api-Session-Token':session}
+	HEADERS['Api-Session-Token'] = session
 	
-	print "%s\n\n%s\n\n" %(response, content)
+	print "url:%s headers:%s" %(url, HEADERS)
+	response, content = http.request(url, "GET", headers = HEADERS)
+	
+	print "response:%s\n\ncontent:%s\n\n" %(response, content)
 	
 	return content
 #end method
@@ -173,15 +190,17 @@ def get_domain_name_list(content):
 
 def name_domain_dns_create(session, domain, hostname, r_type, content, ttl, priority):
 	http = httplib2.Http()
-
+	
 	url = BASE_URL + 'dns/create'
-	headers = {'Api-Session-Token':session}
+	
+	#headers = {'Api-Session-Token':session}
 	body = {'hostname':hostname, 'type':r_type, 'content':content, 'ttl':ttl, 'priority':priority}
-
-	response, content = http.request(url+"/"+domain, "POST", headers=headers, body=json.dumps(body))
-
+	
+	print "url:%s header:%s" %(url, HEADERS)
+	response, content = http.request(url+"/"+domain, "POST", headers=HEADERS, body=json.dumps(body))
+	
 	#response, content = http.request(url+domain, "GET", headers = headers)
-	print "%s\n\n%s\n\n" %(response, content)
+	print "response:%s\n\ncontent:%s\n\n" %(response, content)
 	
 	return content
 #end method
@@ -194,13 +213,14 @@ def name_domain_dns_create_default(session, domain, address):
 
 def name_domain_dns_delete(session, domain, record_id):
 	http = httplib2.Http()
-
+	
 	url = BASE_URL + 'dns/delete'
-	headers = {'Api-Session-Token':session}
+	#headers = {'Api-Session-Token':session}
 	body = {'record_id':record_id}
-
-	response, content = http.request(url+"/"+domain, "POST", headers=headers, body=json.dumps(body))
-	print "%s\n\n%s\n\n" %(response, content)
+	
+	print "url:%s header:%s" %(url, HEADERS)
+	response, content = http.request(url+"/"+domain, "POST", headers=HEADERS, body=json.dumps(body))
+	print "response:%s\n\nconent:%s\n\n" %(response, content)
 	
 	return content
 #end method
@@ -208,13 +228,15 @@ def name_domain_dns_delete(session, domain, record_id):
 
 def name_domain_dns_list(session, domain):
 	http = httplib2.Http()
-
+	
 	url = BASE_URL + 'dns/list'
-	headers = {'Api-Session-Token':session}
-
-	response, content = http.request(url+'/'+domain, "GET", headers = headers)
+	
+	#headers = {'Api-Session-Token':session}
+	
+	print "url:%s header:%s" %(url, HEADERS)
+	response, content = http.request(url+'/'+domain, "GET", headers = HEADERS)
 	print "%s\n\n%s\n\n" %(response, content)
-
+	
 	return content
 #end method
 
@@ -333,6 +355,7 @@ def update_domains_in_configuration(session, address):
 def main():
 	load_config()
 	
+	name_hello()
 	
 	address = get_current_address();
 	
@@ -345,13 +368,17 @@ def main():
 	
 	session = name_login();
 	
-	print "session:%s" %(session)
+	#session = 'bda0bfa685ba8c1967a29a390aa2ca4b32b9593c'
 	
-	name_account()
+	#print "session:%s" %(session)
+	
+	
+	name_account(session)
+	 	
+	update_domains_in_configuration(session, address)
+	
 	
 	#all_domains_dns_record_update(session, address);
-	
-	update_domains_in_configuration(session, address)
 	
 	#content = name_domain_list(session);
 	
